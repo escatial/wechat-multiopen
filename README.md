@@ -23,7 +23,7 @@ wechat-multiopen.exe --doctor --verbose
 
 无参数启动 GUI；带参数启动 CLI。默认实例数为 2，允许范围为 2～4。
 
-GUI 界面会显示检测到的微信路径、版本和当前已运行实例数；微信安装在非默认位置时，可点击"浏览…"手动选择 WeChat.exe / Weixin.exe。
+GUI 界面会显示检测到的微信路径、版本和当前已运行实例数；微信安装在非默认位置时，可点击"更换路径"手动选择 WeChat.exe / Weixin.exe。
 
 3.x 默认配置包含已知互斥体特征；当前已为微信 4.1.15.56 写入两类已确认的 V4 特征：`XWeChat_XWEB_Instance_Identity_Mutex_Name` 和 `*_WeChat_Win_User_Identity_Mutex_Name`。其他 4.x 版本仍需运行侦察后确认，不会在未知特征下尝试关闭句柄。
 

@@ -19,8 +19,8 @@ public partial class MainWindow : Window
         _services.Logger.Enable();
         _services.Logger.Info("gui", "GUI started");
         Title += $" v{AppInfo.Version}";
+        VersionText.Text = $"v{AppInfo.Version}";
         RefreshTargetInfo();
-        StatusText.Text = Compliance.Notice;
         CountTextBox.Focus();
         CountTextBox.SelectAll();
     }
@@ -31,13 +31,23 @@ public partial class MainWindow : Window
         if (target is null)
         {
             WechatText.Text = _overridePath is null
-                ? "未检测到微信，请确认已安装，或点击“浏览…”选择 WeChat.exe / Weixin.exe。"
+                ? "未检测到微信，请确认已安装，或点击「更换路径」选择 WeChat.exe / Weixin.exe。"
                 : $"路径无效：{_overridePath}";
+            VersionChip.Visibility = Visibility.Collapsed;
+            RunningChip.Visibility = Visibility.Collapsed;
             return;
         }
         var running = WeChatDetector.FindRunningProcesses(target).Count;
-        WechatText.Text = $"微信：{target.ExePath}\n版本：{target.FileVersion} ({target.Branch})    当前已运行 {running} 个实例";
+        WechatText.Text = target.ExePath;
+        VersionChip.Visibility = Visibility.Visible;
+        VersionChipText.Text = $"{target.FileVersion} ({target.Branch})";
+        RunningChip.Visibility = Visibility.Visible;
+        RunningChipText.Text = running > 0 ? $"已运行 {running} 个实例" : "当前未运行";
     }
+
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
@@ -58,6 +68,7 @@ public partial class MainWindow : Window
         LaunchButton.IsEnabled = false;
         DoctorButton.IsEnabled = false;
         BrowseButton.IsEnabled = false;
+        LaunchButton.Content = "启动中…";
         try
         {
             if (!TryGetCount(out var count)) return;
@@ -74,6 +85,7 @@ public partial class MainWindow : Window
         }
         finally
         {
+            LaunchButton.Content = "启动实例";
             LaunchButton.IsEnabled = true;
             DoctorButton.IsEnabled = true;
             BrowseButton.IsEnabled = true;
