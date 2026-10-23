@@ -1,12 +1,16 @@
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.Win32;
+using WechatMultiopen.Core;
 using WechatMultiopen.Infrastructure;
+using WechatMultiopen.Models;
 
 namespace WechatMultiopen.Ui;
 
 public partial class MainWindow : Window
 {
     private readonly ServiceSet _services;
+    private string? _overridePath;
 
     public MainWindow(ServiceSet services)
     {
@@ -14,21 +18,50 @@ public partial class MainWindow : Window
         _services = services;
         _services.Logger.Enable();
         _services.Logger.Info("gui", "GUI started");
-        var target = Core.WeChatDetector.Detect(null);
-        WechatText.Text = target is null ? "未检测到微信，请确认已安装。" : $"微信：{target.ExePath}\n版本：{target.FileVersion} ({target.Branch})";
+        Title += $" v{AppInfo.Version}";
+        RefreshTargetInfo();
         StatusText.Text = Compliance.Notice;
         CountTextBox.Focus();
         CountTextBox.SelectAll();
+    }
+
+    private void RefreshTargetInfo()
+    {
+        var target = WeChatDetector.Detect(_overridePath);
+        if (target is null)
+        {
+            WechatText.Text = _overridePath is null
+                ? "未检测到微信，请确认已安装，或点击“浏览…”选择 WeChat.exe / Weixin.exe。"
+                : $"路径无效：{_overridePath}";
+            return;
+        }
+        var running = WeChatDetector.FindRunningProcesses(target).Count;
+        WechatText.Text = $"微信：{target.ExePath}\n版本：{target.FileVersion} ({target.Branch})    当前已运行 {running} 个实例";
+    }
+
+    private void BrowseButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = "选择微信主程序",
+            Filter = "微信主程序|WeChat.exe;Weixin.exe",
+            CheckFileExists = true
+        };
+        if (dialog.ShowDialog(this) != true) return;
+        _overridePath = dialog.FileName;
+        _services.Logger.Info("gui", $"path override={_overridePath}");
+        RefreshTargetInfo();
     }
 
     private async void LaunchButton_Click(object sender, RoutedEventArgs e)
     {
         LaunchButton.IsEnabled = false;
         DoctorButton.IsEnabled = false;
+        BrowseButton.IsEnabled = false;
         try
         {
             if (!TryGetCount(out var count)) return;
-            var report = await _services.Orchestrator.RunAsync(count, null);
+            var report = await _services.Orchestrator.RunAsync(count, _overridePath);
             StatusText.Text = $"已启动 {report.Succeeded}/{report.Requested} 个实例。" +
                               (report.Errors.Count == 0 ? string.Empty : $"\n{string.Join("\n", report.Errors)}");
             _services.Logger.Info("gui", $"completed succeeded={report.Succeeded} requested={report.Requested} errors={report.Errors.Count}");
@@ -39,12 +72,18 @@ public partial class MainWindow : Window
             StatusText.Text = $"[{error.Code}] {error.Reason}\n建议：{error.Advice}";
             _services.Logger.Error("gui", $"failed code={error.Code} message={ex.Message}");
         }
-        finally { LaunchButton.IsEnabled = true; DoctorButton.IsEnabled = true; }
+        finally
+        {
+            LaunchButton.IsEnabled = true;
+            DoctorButton.IsEnabled = true;
+            BrowseButton.IsEnabled = true;
+            RefreshTargetInfo();
+        }
     }
 
     private void DoctorButton_Click(object sender, RoutedEventArgs e)
     {
-        StatusText.Text = _services.Doctor.Run(null);
+        StatusText.Text = _services.Doctor.Run(_overridePath);
     }
 
     private void IncreaseButton_Click(object sender, RoutedEventArgs e) => AdjustCount(1);

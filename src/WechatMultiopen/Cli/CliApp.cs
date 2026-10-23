@@ -17,6 +17,16 @@ public sealed class CliApp
             return 0;
         }
 
+        if (args.Contains("--version", StringComparer.OrdinalIgnoreCase))
+        {
+            Console.WriteLine($"wechat-multiopen {Infrastructure.AppInfo.Version}");
+            var detected = Core.WeChatDetector.Detect(GetValue(args, "-p", "--path"));
+            Console.WriteLine(detected is null
+                ? "微信：未检测到"
+                : $"微信：{detected.ExePath}（{detected.FileVersion}）");
+            return 0;
+        }
+
         if (args.Contains("--doctor", StringComparer.OrdinalIgnoreCase))
         {
             Console.WriteLine(_services.Doctor.Run(GetValue(args, "-p", "--path"), args.Contains("--verbose", StringComparer.OrdinalIgnoreCase)));
@@ -48,7 +58,7 @@ public sealed class CliApp
         return report.Succeeded == report.Requested ? 0 : (int)ErrorCode.LaunchFailed;
     }
 
-    private static int ParseCount(string[] args)
+    internal static int ParseCount(string[] args)
     {
         var value = GetValue(args, "-n", "--count");
         if (value is null) return 2;
@@ -70,7 +80,7 @@ public sealed class CliApp
 
     private static void PrintHelp()
     {
-        Console.WriteLine("wechat-multiopen.exe [-n 2..4] [-p <微信路径>] [--log] [--doctor] [--help]");
+        Console.WriteLine("wechat-multiopen.exe [-n 2..4] [-p <微信路径>] [--log] [--doctor] [--version] [--help]");
         Console.WriteLine("无参数启动图形界面。默认启动 2 个实例。\n");
         Console.WriteLine(Compliance.Notice);
     }

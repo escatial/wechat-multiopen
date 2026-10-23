@@ -53,7 +53,19 @@
                 Click="DecreaseButton_Click" />
       </Grid>
     </Grid>
-    <TextBlock x:Name="WechatText" Grid.Row="2" Text="正在检测微信..." TextWrapping="Wrap" />
+    <Grid Grid.Row="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <TextBlock x:Name="WechatText" Text="正在检测微信..." TextWrapping="Wrap" VerticalAlignment="Center" />
+      <Button x:Name="BrowseButton"
+              Grid.Column="1"
+              Content="浏览…"
+              ToolTip="微信未在默认位置安装时，手动选择 WeChat.exe / Weixin.exe"
+              VerticalAlignment="Center"
+              Click="BrowseButton_Click" />
+    </Grid>
     <Border Grid.Row="3" Margin="0,16,0,16" BorderBrush="#B8C2CC" BorderThickness="1" Padding="4">
       <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
         <TextBlock x:Name="StatusText" TextWrapping="Wrap" />

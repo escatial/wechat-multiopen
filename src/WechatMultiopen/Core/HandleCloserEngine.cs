@@ -75,7 +75,7 @@ public sealed class HandleCloserEngine
         return new CloseResult(candidates, closed, failures);
     }
 
-    private static bool Matches(string pattern, string? value)
+    internal static bool Matches(string pattern, string? value)
     {
         if (value is null) return false;
         if (!pattern.Contains('*')) return value.Equals(pattern, StringComparison.OrdinalIgnoreCase);

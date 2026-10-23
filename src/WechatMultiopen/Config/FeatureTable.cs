@@ -13,15 +13,17 @@ public static class FeatureTableLoader
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public static FeatureTable Load()
-    {
-        var external = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "wechat-multiopen", "mutex_features.json");
+    public static string ExternalPath { get; } = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "wechat-multiopen", "mutex_features.json");
 
-        if (File.Exists(external))
+    public static FeatureTable Load() => Load(ExternalPath);
+
+    internal static FeatureTable Load(string externalPath)
+    {
+        if (File.Exists(externalPath))
         {
-            try { return Parse(File.ReadAllText(external)); }
+            try { return Parse(File.ReadAllText(externalPath)); }
             catch { /* fall back to the embedded safe defaults */ }
         }
 

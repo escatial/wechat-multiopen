@@ -6,6 +6,8 @@ namespace WechatMultiopen.Core;
 
 public sealed class InstanceLauncher
 {
+    private static readonly TimeSpan StabilityWindow = TimeSpan.FromSeconds(3);
+
     private readonly FileLogger _logger;
     public InstanceLauncher(FileLogger logger) => _logger = logger;
 
@@ -20,7 +22,22 @@ public sealed class InstanceLauncher
             cancellationToken.ThrowIfCancellationRequested();
             if (process.HasExited) return new(false, process.Id, "ExitedImmediately");
             process.Refresh();
-            if (process.MainWindowHandle != IntPtr.Zero) return new(true, process.Id, null);
+            if (process.MainWindowHandle != IntPtr.Zero)
+            {
+                // 互斥体可能被微信在窗口出现后重建并导致实例随即闪退，需观察一小段才计入成功。
+                var stableUntil = DateTime.UtcNow + StabilityWindow;
+                while (DateTime.UtcNow < stableUntil)
+                {
+                    await Task.Delay(500, cancellationToken);
+                    process.Refresh();
+                    if (process.HasExited)
+                    {
+                        _logger.Warn("launch", $"pid={process.Id} exited after window");
+                        return new(false, process.Id, "ExitedAfterWindow");
+                    }
+                }
+                return new(true, process.Id, null);
+            }
             await Task.Delay(500, cancellationToken);
         }
         return new(false, process.Id, "WindowTimeout");

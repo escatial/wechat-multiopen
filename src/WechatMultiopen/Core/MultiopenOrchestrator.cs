@@ -34,31 +34,32 @@ public sealed class MultiopenOrchestrator
             _logger.Info("close", $"iteration={i + 1} target={target.ExePath} pids={string.Join(',', pids)} featureCount={feature.Mutexes.Length}");
             var close = _closer.CloseMutexes(pids, feature);
             _logger.Info("close", $"candidates={close.Candidates} closed={close.Closed} failures={close.Failures.Count}");
-            if (feature.Mutexes.Length > 0 && pids.Count > 0 && close.Closed == 0)
+            var matchedAnyCandidate = close.Candidates > 0;
+            if (close.Closed == 0)
             {
                 await Task.Delay(100, cancellationToken);
                 var retryPids = WeChatDetector.FindRunningProcesses(target);
                 var retryClose = _closer.CloseMutexes(retryPids, feature);
                 _logger.Info("close", $"retry candidates={retryClose.Candidates} closed={retryClose.Closed} failures={retryClose.Failures.Count}");
-                if (retryClose.Closed == 0)
-                {
-                    errors.Add(ErrorCatalog.Get(ErrorCode.MutexNotClosed).Reason);
-                    break;
-                }
+                matchedAnyCandidate |= retryClose.Candidates > 0;
             }
 
             var launch = await _launcher.LaunchAsync(target.ExePath, TimeSpan.FromSeconds(25), cancellationToken);
             if (!launch.Success)
             {
                 var retryClose = _closer.CloseMutexes(WeChatDetector.FindRunningProcesses(target), feature);
+                matchedAnyCandidate |= retryClose.Candidates > 0;
                 var retry = retryClose.Closed > 0
                     ? await _launcher.LaunchAsync(target.ExePath, TimeSpan.FromSeconds(25), cancellationToken)
                     : launch;
                 if (!retry.Success)
                 {
+                    // 已有实例却一条特征都没匹配上，说明是版本特征未适配，而不是启动本身的问题。
                     errors.Add(retry.FailReason == "WindowTimeout"
                         ? ErrorCatalog.Get(ErrorCode.WindowTimeout).Reason
-                        : ErrorCatalog.Get(ErrorCode.LaunchFailed).Reason);
+                        : pids.Count > 0 && !matchedAnyCandidate
+                            ? ErrorCatalog.Get(ErrorCode.MutexNotClosed).Reason
+                            : ErrorCatalog.Get(ErrorCode.LaunchFailed).Reason);
                     break;
                 }
                 succeeded++;

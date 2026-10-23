@@ -8,6 +8,8 @@
     <AssemblyName>wechat-multiopen</AssemblyName>
     <RootNamespace>WechatMultiopen</RootNamespace>
     <StartupObject>WechatMultiopen.Program</StartupObject>
+    <Version>1.1.0</Version>
+    <Product>微信多开助手</Product>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
@@ -21,5 +23,6 @@
     <Page Include="App.xaml" />
     <Page Include="Ui\MainWindow.xaml" />
     <EmbeddedResource Include="Config\mutex_features.json" />
+    <InternalsVisibleTo Include="WechatMultiopen.Tests" />
   </ItemGroup>
 </Project>
