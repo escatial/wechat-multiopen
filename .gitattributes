@@ -1,0 +1,1 @@
+artifacts/Release/wechat-multiopen.exe filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EB048F22-7402-4CE3-BCF3-8E1D6E965C85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WechatMultiopen", "src\WechatMultiopen\WechatMultiopen.csproj", "{8E285609-9C01-410D-812B-A71C15237EA5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{86FA47E8-AFF9-4D7F-A8E8-9769D8A146FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WechatMultiopen.Tests", "tests\WechatMultiopen.Tests\WechatMultiopen.Tests.csproj", "{A3810EFE-126F-48A1-8344-3EEC7DD28770}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8E285609-9C01-410D-812B-A71C15237EA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E285609-9C01-410D-812B-A71C15237EA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E285609-9C01-410D-812B-A71C15237EA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E285609-9C01-410D-812B-A71C15237EA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3810EFE-126F-48A1-8344-3EEC7DD28770}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3810EFE-126F-48A1-8344-3EEC7DD28770}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3810EFE-126F-48A1-8344-3EEC7DD28770}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3810EFE-126F-48A1-8344-3EEC7DD28770}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8E285609-9C01-410D-812B-A71C15237EA5} = {EB048F22-7402-4CE3-BCF3-8E1D6E965C85}
+		{A3810EFE-126F-48A1-8344-3EEC7DD28770} = {86FA47E8-AFF9-4D7F-A8E8-9769D8A146FF}
+	EndGlobalSection
+EndGlobal

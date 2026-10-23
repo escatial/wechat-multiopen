@@ -1,0 +1,13 @@
+.dotnet8/
+.dotnet-install.ps1
+
+**/bin/
+**/obj/
+
+*.user
+*.suo
+*.pdb
+
+*.log
+*.tmp
+
